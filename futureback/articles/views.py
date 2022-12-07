@@ -1,11 +1,8 @@
 from django.shortcuts import render
-from django.views.generic import ListView
+from django.views.generic import TemplateView
 
 
 # Create your views here.
-class ArticlesHome(ListView):
+class ArticlesHome(TemplateView):
 
     template_name = 'articles/index.html'
-
-    def get_queryset(self):
-        return [(1,), (2,)]
