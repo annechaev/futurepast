@@ -1,7 +1,16 @@
 version: "3"
+
+networks:
+  django:
+    name: django
+
 services:
   db:
     image: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - django
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -10,11 +19,13 @@ services:
       - POSTGRES_PASSWORD=postgres
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
       - "8000:8000"
+    networks:
+      - django
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
