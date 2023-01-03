@@ -1,7 +1,12 @@
 from django.db import models
 from django_extensions.db.models import AutoSlugField
+from transliterate import translit
 
 # Create your models here.
+
+
+def my_slugify(content):
+    return translit(content.replace(' ', '_').lower(), language_code='ru', reversed=True)
 
 
 class Articles(models.Model):
@@ -12,7 +17,7 @@ class Articles(models.Model):
     image = models.ImageField(upload_to="images/%Y/%m/%d/")
     image_top = models.ImageField(upload_to="images_top/%Y/%m/%d/")
     views = models.BigIntegerField()
-    slug = AutoSlugField(populate_from='title', unique=True, db_index=True)
+    slug = AutoSlugField(populate_from='title', slugify_function=my_slugify, unique=True)
     author_id = models.ForeignKey('Authors', on_delete=models.PROTECT, null=True)
     category_id = models.ForeignKey('Categories', on_delete=models.PROTECT, null=True)
 
@@ -23,7 +28,7 @@ class Articles(models.Model):
 class Authors(models.Model):
 
     name = models.CharField(max_length=255, verbose_name="Имя")
-    slug = AutoSlugField(populate_from='name', unique=True)
+    slug = AutoSlugField(populate_from=['name'], slugify_function=my_slugify, unique=True)
 
     def __str__(self):
         return self.name
@@ -32,7 +37,7 @@ class Authors(models.Model):
 class Categories(models.Model):
 
     title = models.CharField(max_length=255)
-    slug = AutoSlugField(populate_from='title', unique=True)
+    slug = AutoSlugField(populate_from=['title'], slugify_function=my_slugify, unique=True)
 
     def __str__(self):
         return self.title

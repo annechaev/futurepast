@@ -27,8 +27,11 @@ services:
     networks:
       - django
     environment:
+      - ENV=server
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    links:
+      - db
     depends_on:
       - db

@@ -6,7 +6,7 @@ from django.db import connection
 
 class FileHelper:
 
-    os_delimiter = "\\" if os.name.lower() != "linux" else "/"
+    os_delimiter = "\\" if not os.getenv("ENV") == 'server' else "/"
 
     @classmethod
     def open_json_file(cls, app_name, filename):
