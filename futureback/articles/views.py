@@ -1,17 +1,27 @@
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import ListView
 from helper import FileHelper
 from articles.models import Articles, Authors, Categories
 
 
-# Create your views here.
-class ArticlesHome(View):
-
+class ArticlesHome(ListView):
+    model = Articles
     template_name = 'articles/index.html'
+    context_object_name = 'articles'
 
-    def get(self, request):
-        return render(request, self.template_name)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Главная страница")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_user_context(self, **kwargs):
+        context = kwargs
+        context['menu'] = Categories.objects.all()
+
+        return context
+
+    def get_queryset(self):
+        return Articles.objects.all()
 
 
 def update_db(request):
