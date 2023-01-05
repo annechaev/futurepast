@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django_extensions.db.models import AutoSlugField
 from transliterate import translit
 
@@ -6,7 +7,7 @@ from transliterate import translit
 
 
 def my_slugify(content):
-    return translit(content.replace(' ', '_').lower(), language_code='ru', reversed=True)
+    return translit(content.replace(' ', '_').lower(), language_code='ru', reversed=True).replace("'", "")
 
 
 class Articles(models.Model):
@@ -41,3 +42,6 @@ class Categories(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'cat_slug': self.slug})
