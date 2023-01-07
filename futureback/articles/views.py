@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView, DetailView
 
 from articles.utils import DataMixin, update_db
 from articles.models import Articles, Authors, Categories
@@ -38,12 +38,25 @@ class ArticlesCategory(DataMixin, ListView):
         return Articles.objects.filter(category_id__slug=self.kwargs['cat_slug']).select_related('category_id')
 
 
-class AboutUs(DataMixin, View):
+class ShowArticle(DataMixin, DetailView):
+    model = Articles
+    template_name = 'articles/article.html'
+    slug_url_kwarg = 'article_slug'
+    context_object_name = 'article'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title=context['article'])
+        return dict(list(context.items()) + list(c_def.items()))
+
+
+class AboutUs(DataMixin, TemplateView):
     template_name = 'articles/about.html'
 
-    def get(self, request):
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title="О нас")
-        return render(request, self.template_name, context=dict(list(c_def.items())))
+        return dict(list(context.items()) + list(c_def.items()))
 
 
 class DbUses(View):

@@ -2,12 +2,14 @@ from django.db import models
 from django.urls import reverse
 from django_extensions.db.models import AutoSlugField
 from transliterate import translit
+import re
 
 # Create your models here.
 
 
 def my_slugify(content):
-    return translit(content.replace(' ', '_').lower(), language_code='ru', reversed=True).replace("'", "")
+    translit_content = translit(content.replace(' ', '_').lower(), language_code='ru', reversed=True)
+    return re.subn("[:`']", "", translit_content)[0]
 
 
 class Articles(models.Model):
@@ -24,6 +26,9 @@ class Articles(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('article', kwargs={'article_slug': self.slug})
 
 
 class Authors(models.Model):
